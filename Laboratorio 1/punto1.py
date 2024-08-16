@@ -59,19 +59,17 @@ valorPorPrioridad = {
 
 M = ConcreteModel()
 
-Tareas = RangeSet(0,10)
+M.tareas = Var(RangeSet(0,10), domain=Binary)
 
-M.tareas = Var(Tareas, domain=Binary)
+M.obj = Objective(expr = sum(M.tareas[tarea] * valorPorPrioridad[prioridadPorTarea[tarea]] for tarea in M.tareas), sense=maximize)
 
-M.obj = Objective(expr = sum(M.tareas[tarea] * valorPorPrioridad[prioridadPorTarea[tarea]] for tarea in Tareas), sense=maximize)
-
-M.res = Constraint(expr = sum(M.tareas[tarea]* puntosPorTarea[tarea] for tarea in Tareas) <= puntosMaximosPorDesarrollador * numeroDesarrolladores )
+M.res = Constraint(expr = sum(M.tareas[tarea]* puntosPorTarea[tarea] for tarea in M.tareas) <= puntosMaximosPorDesarrollador * numeroDesarrolladores )
 
 SolverFactory('glpk').solve(M)
 
 M.display()
 
-for tarea in Tareas:
+for tarea in M.tareas:
     if M.tareas[tarea]() == 1:
         print(f"La tarea {tarea + 1} fue elegida, con prioridad {prioridadPorTarea[tarea]} y {puntosPorTarea[tarea]} puntos.")
 

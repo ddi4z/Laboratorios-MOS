@@ -27,6 +27,7 @@ M = ConcreteModel()
 # Datos
     # Recursos
 nombrePorRecurso = ["Alimentos Básicos", "Medicinas", "Equipos Médicos", "Agua Potable", "Mantas" ]
+idPorNombre = { nombre: i for i, nombre in enumerate(nombrePorRecurso) }
 valorPorRecurso = [50, 100, 120, 60, 40]
 pesoPorRecurso = [15, 5, 20, 18, 10]
 volumenPorRecurso = [8, 2, 10, 12, 6]
@@ -60,17 +61,24 @@ for j in M.aviones:
 
 
 """
-    Restricciones de Almacenamiento de Recursos:
-        Seguridad de Medicamentos:
-            No se puede transportar a las Medicinas en el Avión 1
-            por la falta de condiciones para mantener la
-            temperatura controlada, crucial para la efectividad
-            de los medicamentos.
+Restricciones de Almacenamiento de Recursos:
+    Seguridad de Medicamentos:
+        No se puede transportar a las Medicinas en el Avión 1
+        por la falta de condiciones para mantener la
+        temperatura controlada, crucial para la efectividad
+        de los medicamentos.
 
-        Compatibilidad de Equipos Médicos y Agua Potable:
-            Los Equipos Médicos y el Agua Potable no pueden ser transportados en el mismo avión debido al riesgo de contaminación cruzada. El derrame de agua podría dañar los equipos médicos delicados.
+    Compatibilidad de Equipos Médicos y Agua Potable:
+        Los Equipos Médicos y el Agua Potable no pueden ser
+        transportados en el mismo avión debido al riesgo de
+        contaminación cruzada. El derrame de agua podría dañar
+        los equipos médicos delicados.
 """
 
+M.seguridadMedicamentos = Constraint(expr= M.asignacion[idPorNombre["Medicinas"], 0 ] == 0)
+M.compatibilidadEquiposAgua = ConstraintList()
+for avion in M.aviones:
+    M.compatibilidadEquiposAgua.add(expr= M.asignacion[idPorNombre["Equipos Médicos"],avion] + M.asignacion[idPorNombre["Agua Potable"],avion] <= 1)
 
 SolverFactory('glpk').solve(M)
 
