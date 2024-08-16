@@ -60,6 +60,11 @@ M.display()
 
 for trabajador in M.trabajadores:
     print(f"Trabajador {trabajador + 1}:")
+    tiempo, ganancia = 0, 0
     for tarea in M.tareas:
         if M.asignacion[tarea, trabajador]() == 1:
             print(f"\tTarea {tarea + 1} con ganancia {gananciaPorTrabajo[tarea]} y tiempo {tiempoPorTrabajo[tarea]}")
+            tiempo += tiempoPorTrabajo[tarea]
+            ganancia += gananciaPorTrabajo[tarea]
+    print(f"\n\tTiempo total: {tiempo} horas de {horasDisponiblesPorTrabajador[trabajador]} disponibles")
+    print(f"\tGanancia total: {ganancia}\n")

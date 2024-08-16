@@ -86,6 +86,11 @@ M.display()
 
 for avion in M.aviones:
     print(f"Avión {avion + 1}:")
+    valor, peso, volumen = 0, 0, 0
     for recurso in M.recursos:
         if M.asignacion[recurso, avion]() == 1:
             print(f"\tRecurso {nombrePorRecurso[recurso]} con valor {valorPorRecurso[recurso]}, peso {pesoPorRecurso[recurso]} y volumen {volumenPorRecurso[recurso]}")
+            valor += valorPorRecurso[recurso]
+            peso += pesoPorRecurso[recurso]
+            volumen += volumenPorRecurso[recurso]
+    print(f"\n\tValor total: {valor}, Peso total: {peso} de {pesoPorAvion[avion]} disponibles, Volumen total: {volumen} de {volumenPorAvion[avion]} disponibles\n")
