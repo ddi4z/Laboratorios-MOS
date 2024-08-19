@@ -27,7 +27,7 @@ M = ConcreteModel()
 # Datos
     # Recursos
 nombrePorRecurso = ["Alimentos Básicos", "Medicinas", "Equipos Médicos", "Agua Potable", "Mantas" ]
-idPorNombre = { nombre: i for i, nombre in enumerate(nombrePorRecurso) }
+idPorNombre = { nombre: id for id, nombre in enumerate(nombrePorRecurso) }
 valorPorRecurso = [50, 100, 120, 60, 40]
 pesoPorRecurso = [15, 5, 20, 18, 10]
 volumenPorRecurso = [8, 2, 10, 12, 6]
@@ -43,21 +43,21 @@ M.aviones = RangeSet(0,2)
 M.asignacion = Var(M.recursos, M.aviones, domain=Binary)
 
 # Función objetivo
-M.obj = Objective(expr=sum(M.asignacion[i,j] * valorPorRecurso[i] for i in M.recursos for j in M.aviones), sense=maximize)
+M.obj = Objective(expr=sum(M.asignacion[recurso, avion] * valorPorRecurso[recurso] for recurso in M.recursos for avion in M.aviones), sense=maximize)
 
 # Restricciones
 
 # Cada recurso debe ser asignado a un único avión
 M.unicidad = ConstraintList()
-for i in M.recursos:
-    M.unicidad.add(expr=sum(M.asignacion[i, j] for j in M.aviones) == 1)
+for recurso in M.recursos:
+    M.unicidad.add(expr=sum(M.asignacion[recurso, j] for j in M.aviones) == 1)
 
 # Cada avión no puede exceder su límite de peso ni de volumen
 M.limitePeso = ConstraintList()
 M.limiteVolumen = ConstraintList()
-for j in M.aviones:
-    M.limitePeso.add(expr=sum(M.asignacion[i,j] * pesoPorRecurso[i] for i in M.recursos) <= pesoPorAvion[j])
-    M.limiteVolumen.add(expr=sum(M.asignacion[i,j] * volumenPorRecurso[i] for i in M.recursos) <= volumenPorAvion[j])
+for avion in M.aviones:
+    M.limitePeso.add(expr=sum(M.asignacion[recurso, avion] * pesoPorRecurso[recurso] for recurso in M.recursos) <= pesoPorAvion[avion])
+    M.limiteVolumen.add(expr=sum(M.asignacion[recurso, avion] * volumenPorRecurso[recurso] for recurso in M.recursos) <= volumenPorAvion[avion])
 
 
 """

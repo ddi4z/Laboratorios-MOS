@@ -40,19 +40,19 @@ M.tareas = Tareas
 M.asignacion = Var(M.tareas, M.trabajadores, domain=Binary)
 
 # Función objetivo
-M.obj = Objective(expr=sum(M.asignacion[i,j] * gananciaPorTrabajo[i] for i in M.tareas for j in M.trabajadores), sense=maximize)
+M.obj = Objective(expr=sum(M.asignacion[tarea,trabajador] * gananciaPorTrabajo[tarea] for tarea in M.tareas for trabajador in M.trabajadores), sense=maximize)
 
 # Restricciones
 
 # Cada tarea debe ser asignada a un único trabajador
 M.unicidad = ConstraintList()
-for i in M.tareas:
-    M.unicidad.add(expr=sum(M.asignacion[i, j] for j in M.trabajadores) == 1)
+for tarea in M.tareas:
+    M.unicidad.add(expr=sum(M.asignacion[tarea, trabajador] for trabajador in M.trabajadores) == 1)
 
 # Cada trabajador no puede exceder su límite de horas
 M.limiteHoras = ConstraintList()
-for j in M.trabajadores:
-    M.limiteHoras.add(expr=sum(M.asignacion[i,j] * tiempoPorTrabajo[i] for i in M.tareas) <= horasDisponiblesPorTrabajador[j])
+for trabajador in M.trabajadores:
+    M.limiteHoras.add(expr=sum(M.asignacion[tarea, trabajador] * tiempoPorTrabajo[tarea] for tarea in M.tareas) <= horasDisponiblesPorTrabajador[trabajador])
 
 SolverFactory('glpk').solve(M)
 
