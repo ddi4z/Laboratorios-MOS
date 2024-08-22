@@ -8,7 +8,7 @@
         de las tareas y los puntos de historia asociados.
         El equipo consiste en 4 desarolladores, y la duración
         del sprint suele ser de 2 semanas. Por regla general
-        cada desarollador no debe tener mas de 24 puntos de
+        cada desarollador no debe tener mas de 13 puntos de
         historia asociados a ellos mismos. Con base a esta
         información realiza un modelo de optimización que tome
         las tareas que se pueden realizar en este sprint
@@ -29,7 +29,7 @@ from pyomo.environ import *
 from pyomo.opt import SolverFactory
 
 numeroDesarrolladores = 4
-puntosMaximosPorDesarrollador = 24
+puntosMaximosPorDesarrollador = 13
 
 puntosPorTarea = [5,3,13,1,21,2,2,5,8,13,21]
 
