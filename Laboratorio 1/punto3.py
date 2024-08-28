@@ -50,7 +50,7 @@ M.obj = Objective(expr=sum(M.asignacion[recurso, avion] * valorPorRecurso[recurs
 # Cada recurso debe ser asignado a un único avión
 M.unicidad = ConstraintList()
 for recurso in M.recursos:
-    M.unicidad.add(expr=sum(M.asignacion[recurso, j] for j in M.aviones) == 1)
+    M.unicidad.add(expr=sum(M.asignacion[recurso, avion] for avion in M.aviones) == 1)
 
 # Cada avión no puede exceder su límite de peso ni de volumen
 M.limitePeso = ConstraintList()
