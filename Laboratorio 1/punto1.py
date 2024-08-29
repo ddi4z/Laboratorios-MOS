@@ -24,6 +24,7 @@
 
 from pyomo.environ import *
 from pyomo.opt import SolverFactory
+from matplotlib import pyplot as plt
 
 # Datos
 numeroDesarrolladores = 4
@@ -70,7 +71,21 @@ SolverFactory('glpk').solve(M)
 
 M.display()
 
+#Impresión
 for tarea in M.tareas:
     if M.tareas[tarea]() == 1:
         print(f"La tarea {tarea + 1} fue elegida, con prioridad {prioridadPorTarea[tarea]} y {puntosPorTarea[tarea]} puntos.")
 
+# Guardado
+tareas = list(M.tareas)
+tareasSeleccionadas = [M.tareas[tarea]() for tarea in M.tareas]
+
+# Diagrama de barras
+plt.bar(tareas, [sp * selec for sp, selec in zip(puntosPorTarea, tareasSeleccionadas)], color='blue', label='Tareas Seleccionadas')
+
+plt.xlabel("Tareas")
+plt.ylabel("Puntos de historia")
+plt.title("Asignación de puntos de historia a tareas seleccionadas")
+plt.xticks(tareas, [f"T{tarea}" for tarea in tareas])
+plt.legend()
+plt.show()
