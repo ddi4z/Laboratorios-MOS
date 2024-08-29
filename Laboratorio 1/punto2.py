@@ -13,9 +13,6 @@
         realización. El objetivo es asignar los trabajos
         de manera que se maximice la ganancia total sin
         exceder el tiempo disponible para cada trabajador.
-
-    Solución:
-        @Author: ddi4z
 """
 
 from pyomo.environ import *
@@ -30,29 +27,27 @@ tiempoPorTrabajo = [4, 5, 3, 6, 2]
 M = ConcreteModel()
 
 # Definición de conjuntos (3 trabajadores y 5 tareas)
-Trabajadores = RangeSet(0,2)
-Tareas = RangeSet(0,4)
-M.trabajadores = Trabajadores
-M.tareas = Tareas
+M.trabajadores = RangeSet(0,2)
+M.tareas = RangeSet(0,4)
 
 # Matriz de M.tareas x M.trabajadores
 # 1 si la tarea i es asignada al trabajador j, 0 en otro caso
 M.asignacion = Var(M.tareas, M.trabajadores, domain=Binary)
 
 # Función objetivo
-M.obj = Objective(expr=sum(M.asignacion[tarea,trabajador] * gananciaPorTrabajo[tarea] for tarea in M.tareas for trabajador in M.trabajadores), sense=maximize)
+M.obj = Objective(expr = sum(M.asignacion[tarea, trabajador] * gananciaPorTrabajo[tarea] for tarea in M.tareas for trabajador in M.trabajadores), sense=maximize)
 
 # Restricciones
 
 # Cada tarea debe ser asignada a un único trabajador
 M.unicidad = ConstraintList()
 for tarea in M.tareas:
-    M.unicidad.add(expr=sum(M.asignacion[tarea, trabajador] for trabajador in M.trabajadores) == 1)
+    M.unicidad.add(expr = sum(M.asignacion[tarea, trabajador] for trabajador in M.trabajadores) == 1)
 
 # Cada trabajador no puede exceder su límite de horas
 M.limiteHoras = ConstraintList()
 for trabajador in M.trabajadores:
-    M.limiteHoras.add(expr=sum(M.asignacion[tarea, trabajador] * tiempoPorTrabajo[tarea] for tarea in M.tareas) <= horasDisponiblesPorTrabajador[trabajador])
+    M.limiteHoras.add(expr = sum(M.asignacion[tarea, trabajador] * tiempoPorTrabajo[tarea] for tarea in M.tareas) <= horasDisponiblesPorTrabajador[trabajador])
 
 SolverFactory('glpk').solve(M)
 

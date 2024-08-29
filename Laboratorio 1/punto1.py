@@ -4,11 +4,11 @@
 
     Descripción:
         Un Scrum Master necesita asignar un conjunto de tareas
-        a un equipo de desarrollo (pod) basado en la prioridad
+        a un equipo de desarrollo basado en la prioridad
         de las tareas y los puntos de historia asociados.
         El equipo consiste en 4 desarolladores, y la duración
         del sprint suele ser de 2 semanas. Por regla general
-        cada desarollador no debe tener mas de 13 puntos de
+        cada desarollador no debe tener más de 13 puntos de
         historia asociados a ellos mismos. Con base a esta
         información realiza un modelo de optimización que tome
         las tareas que se pueden realizar en este sprint
@@ -20,18 +20,16 @@
         usará es que el número máximo de puntos no debe ser
         superior a los puntos máximos por trabajador
         multiplicado por el número de trabajadores
-
-    Solución:
-        @Author: ddi4z
 """
 
 from pyomo.environ import *
 from pyomo.opt import SolverFactory
 
+# Datos
 numeroDesarrolladores = 4
 puntosMaximosPorDesarrollador = 13
 
-puntosPorTarea = [5,3,13,1,21,2,2,5,8,13,21]
+puntosPorTarea = [5, 3, 13, 1, 21, 2, 2, 5, 8, 13, 21]
 
 prioridadPorTarea = [
     "Maxima",
@@ -59,11 +57,14 @@ valorPorPrioridad = {
 
 M = ConcreteModel()
 
+# Definición de conjunto (11 tareas)
 M.tareas = Var(RangeSet(0,10), domain=Binary)
 
+# Función objetivo
 M.obj = Objective(expr = sum(M.tareas[tarea] * valorPorPrioridad[prioridadPorTarea[tarea]] for tarea in M.tareas), sense=maximize)
 
-M.res = Constraint(expr = sum(M.tareas[tarea]* puntosPorTarea[tarea] for tarea in M.tareas) <= puntosMaximosPorDesarrollador * numeroDesarrolladores )
+# Restricciones
+M.res = Constraint(expr = sum(M.tareas[tarea] * puntosPorTarea[tarea] for tarea in M.tareas) <= puntosMaximosPorDesarrollador * numeroDesarrolladores )
 
 SolverFactory('glpk').solve(M)
 

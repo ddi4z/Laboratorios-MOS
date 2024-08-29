@@ -14,9 +14,6 @@
         maximizar la importancia total de los recursos
         transportados, respetando las limitaciones de los
         aviones y algunas restricciones logísticas y de seguridad.
-
-    Solución:
-        @Author: ddi4z
 """
 
 from pyomo.environ import *
@@ -25,13 +22,15 @@ from pyomo.opt import SolverFactory
 M = ConcreteModel()
 
 # Datos
-    # Recursos
-nombrePorRecurso = ["Alimentos Básicos", "Medicinas", "Equipos Médicos", "Agua Potable", "Mantas" ]
+
+# Recursos
+nombrePorRecurso = ["Alimentos Básicos", "Medicinas", "Equipos Médicos", "Agua Potable", "Mantas"]
 idPorNombre = { nombre: id for id, nombre in enumerate(nombrePorRecurso) }
 valorPorRecurso = [50, 100, 120, 60, 40]
 pesoPorRecurso = [15, 5, 20, 18, 10]
 volumenPorRecurso = [8, 2, 10, 12, 6]
-    # Aviones
+
+# Aviones
 pesoPorAvion = [30, 40, 50]
 volumenPorAvion = [25, 30, 35]
 
@@ -43,22 +42,21 @@ M.aviones = RangeSet(0,2)
 M.asignacion = Var(M.recursos, M.aviones, domain=Binary)
 
 # Función objetivo
-M.obj = Objective(expr=sum(M.asignacion[recurso, avion] * valorPorRecurso[recurso] for recurso in M.recursos for avion in M.aviones), sense=maximize)
+M.obj = Objective(expr = sum(M.asignacion[recurso, avion] * valorPorRecurso[recurso] for recurso in M.recursos for avion in M.aviones), sense=maximize)
 
 # Restricciones
 
 # Cada recurso debe ser asignado a un único avión
 M.unicidad = ConstraintList()
 for recurso in M.recursos:
-    M.unicidad.add(expr=sum(M.asignacion[recurso, avion] for avion in M.aviones) == 1)
+    M.unicidad.add(expr = sum(M.asignacion[recurso, avion] for avion in M.aviones) == 1)
 
 # Cada avión no puede exceder su límite de peso ni de volumen
 M.limitePeso = ConstraintList()
 M.limiteVolumen = ConstraintList()
 for avion in M.aviones:
-    M.limitePeso.add(expr=sum(M.asignacion[recurso, avion] * pesoPorRecurso[recurso] for recurso in M.recursos) <= pesoPorAvion[avion])
-    M.limiteVolumen.add(expr=sum(M.asignacion[recurso, avion] * volumenPorRecurso[recurso] for recurso in M.recursos) <= volumenPorAvion[avion])
-
+    M.limitePeso.add(expr = sum(M.asignacion[recurso, avion] * pesoPorRecurso[recurso] for recurso in M.recursos) <= pesoPorAvion[avion])
+    M.limiteVolumen.add(expr = sum(M.asignacion[recurso, avion] * volumenPorRecurso[recurso] for recurso in M.recursos) <= volumenPorAvion[avion])
 
 """
 Restricciones de Almacenamiento de Recursos:
@@ -75,10 +73,10 @@ Restricciones de Almacenamiento de Recursos:
         los equipos médicos delicados.
 """
 
-M.seguridadMedicamentos = Constraint(expr= M.asignacion[idPorNombre["Medicinas"], 0 ] == 0)
+M.seguridadMedicamentos = Constraint(expr = M.asignacion[idPorNombre["Medicinas"], 0 ] == 0)
 M.compatibilidadEquiposAgua = ConstraintList()
 for avion in M.aviones:
-    M.compatibilidadEquiposAgua.add(expr= M.asignacion[idPorNombre["Equipos Médicos"],avion] + M.asignacion[idPorNombre["Agua Potable"],avion] <= 1)
+    M.compatibilidadEquiposAgua.add(expr = M.asignacion[idPorNombre["Equipos Médicos"],avion] + M.asignacion[idPorNombre["Agua Potable"],avion] <= 1)
 
 SolverFactory('glpk').solve(M)
 
