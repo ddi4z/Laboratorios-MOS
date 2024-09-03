@@ -12,7 +12,7 @@ def obtenerDatosDeArchivo():
     return nodos, matriz
 
 # Función que crea un grafo de la solución del MTSP
-def crearGrafoDeSolucion(M):
+def crearGrafoDeSolucion(M, nodos):
     grafo = nx.DiGraph()
     for nodo in nodos:
         grafo.add_node(nodo)
@@ -23,18 +23,18 @@ def crearGrafoDeSolucion(M):
     return grafo
 
 # Función que grafica la solución del MTSP
-def graficarMTSP(M):
-    grafo = crearGrafoDeSolucion(M)
+def graficarMTSP(grafo):
     pos = nx.spring_layout(grafo)
     plt.figure()
     nx.draw(grafo, pos, edge_color='blue', with_labels=True, node_size=500, node_color='lightblue')
     plt.show()
 
 # Función que obtiene la solución del MTSP
-def obtenerSolucion(M):
+def obtenerSolucion(M, nodos):
     SolverFactory('glpk').solve(M)
     M.display()
-    graficarMTSP(M)
+    grafo = crearGrafoDeSolucion(M, nodos)
+    graficarMTSP(grafo)
 
 # Obtención de los datos del archivo
 nodos, matrizDeAdyacencia = obtenerDatosDeArchivo()
@@ -88,4 +88,4 @@ for i in M.nodos:
         if i != j and min(i, j) != 0:
             M.subtours.add(expr = M.posicion[i] - M.posicion[j] + M.numeroDeNodos * M.asignacion[i, j] <= M.numeroDeNodos - 1)
 
-obtenerSolucion(M)
+obtenerSolucion(M, nodos)
