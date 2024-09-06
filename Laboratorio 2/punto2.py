@@ -6,7 +6,7 @@ from pyomo.opt import SolverFactory
 
 # Función que lee los datos del archivo proof_case.csv y los retorna en una lista de nodos y una matriz de adyacencia
 def obtenerDatosDeArchivo():
-    df = pd.read_csv("Laboratorio 2/proof_case.csv", header=None, delimiter=',')
+    df = pd.read_csv("Laboratorio 2/proof_case.csv", header = None, delimiter = ',')
     nodos = df.iloc[0].astype(int)
     matriz = df.iloc[1:].astype(float).values
     return nodos, matriz
@@ -19,7 +19,7 @@ def crearGrafoDeSolucion(M, nodos):
     for i in M.nodos:
         for j in M.nodos:
             if M.asignacion[i, j].value == 1:
-                grafo.add_edge(i, j, color='blue')
+                grafo.add_edge(i, j, color = 'blue')
     return grafo
 
 # Función que grafica la solución del MTSP

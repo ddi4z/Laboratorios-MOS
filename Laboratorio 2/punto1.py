@@ -22,27 +22,27 @@ def crearGrafos(M):
     # Se agregan los nodos y aristas
     for i, ciudad in enumerate(ciudadPorIndice):
         G_bogota.add_node(ciudad)
-        G_bogota.add_edge("Bogotá", ciudad, weight=resultadosBogota[i])
+        G_bogota.add_edge("Bogotá", ciudad, weight = resultadosBogota[i])
         G_medellin.add_node(ciudad)
-        G_medellin.add_edge("Medellín", ciudad, weight=resultadosMedellin[i])
+        G_medellin.add_edge("Medellín", ciudad, weight = resultadosMedellin[i])
         G_resumen.add_node(ciudad)
-        G_resumen.add_edge("Bogotá y Medellín", ciudad, weight=resultadosTotales[i])
-    return G_bogota, G_medellin
+        G_resumen.add_edge("Bogotá y Medellín", ciudad, weight = resultadosTotales[i])
+    return G_bogota, G_medellin, G_resumen
 
 # Función que grafica un grafo con los costos de transporte desde una ciudad
 def graficarGrafo(G, ax, titulo, color):
     pos = nx.spring_layout(G)
-    nx.draw(G, pos, with_labels=True, ax=ax, node_color=color, node_size=2000, font_size=10, font_weight='bold', arrows=True)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels={(u, v): int(d["weight"]) for u, v, d in G.edges(data=True)}, ax=ax)
+    nx.draw(G, pos, with_labels = True, ax = ax, node_color = color, node_size = 2000, font_size = 10, font_weight = 'bold', arrows = True)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels = {(u, v): int(d["weight"]) for u, v, d in G.edges(data = True)}, ax = ax)
     ax.set_title(titulo)
 
 
 # Función que grafica el número de toneladas que se envían desde Bogotá y Medellín a cada ciudad
 def graficarCostos(G_bogota, G_medellin, G_resumen):
-    fig, ax = plt.subplots(1, 3, figsize=(14, 7))
+    fig, ax = plt.subplots(1, 3, figsize = (14, 7))
     graficarGrafo(G_bogota, ax[0], "Distribución desde Bogotá", "lightblue")
     graficarGrafo(G_medellin, ax[1], "Distribución desde Medellín", "gold")
-    graficarGrafo(G_medellin, ax[2], "Distribución total", "yellow")
+    graficarGrafo(G_resumen, ax[2], "Distribución total", "yellow")
     plt.show()
 
 
@@ -62,11 +62,11 @@ M = ConcreteModel()
 # Ciudades origen
 # Bogota
 M.ofertaBogota = Param(within = NonNegativeIntegers, default = 550)
-costosTrasporteBogota = [1e19, 2.5, 1.6, 1.4, 0.8, 1.4]
+costosTrasporteBogota = [1e8, 2.5, 1.6, 1.4, 0.8, 1.4]
 
 # Medellin
 M.ofertaMedellin = Param(within = NonNegativeIntegers, default = 700)
-costosTrasporteMedellin = [2.5, 1e19, 2.0, 1.0, 1.0, 0.8]
+costosTrasporteMedellin = [2.5, 1e8, 2.0, 1.0, 1.0, 0.8]
 
 # Ciudades destino
 demandaPorCiudad = [125, 175, 225, 250, 225,200]
@@ -78,7 +78,7 @@ M.ciudades = RangeSet(0, M.cantidadCiudades - 1)
 M.toneladasDesdeBogota = Var(M.ciudades, domain = NonNegativeIntegers)
 M.toneladasDesdeMedellin = Var(M.ciudades, domain = NonNegativeIntegers)
 
-# Función objetivo
+# Función objetivo: Minimizar el costo total de transporte
 M.obj = Objective(expr = sum(M.toneladasDesdeBogota[ciudad] * costosTrasporteBogota[ciudad] for ciudad in M.ciudades) + sum(M.toneladasDesdeMedellin[ciudad] * costosTrasporteMedellin[ciudad] for ciudad in M.ciudades), sense=minimize)
 
 # Restricciones
