@@ -27,6 +27,7 @@ def graficarMTSP(grafo):
     pos = nx.spring_layout(grafo)
     plt.figure()
     nx.draw(grafo, pos, edge_color='blue', with_labels=True, node_size=500, node_color='lightblue')
+    plt.title(f"El costo total del MTSP es: {M.objetivo()}")
     plt.show()
 
 # Función que obtiene la solución del MTSP

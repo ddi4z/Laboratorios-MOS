@@ -43,6 +43,7 @@ def graficarCostos(G_bogota, G_medellin, G_resumen):
     graficarGrafo(G_bogota, ax[0], "Distribución desde Bogotá", "lightblue")
     graficarGrafo(G_medellin, ax[1], "Distribución desde Medellín", "gold")
     graficarGrafo(G_resumen, ax[2], "Distribución total", "yellow")
+    plt.suptitle("Costo total de transporte: " + str(M.obj()), fontsize = 16)
     plt.show()
 
 

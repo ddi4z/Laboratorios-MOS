@@ -28,37 +28,47 @@ def obtenerDatosDeArchivo():
 # Función que grafica la solución del problema como un grafo
 def graficarSolucion(M, matrizDeAdyacencia, informacion):
     grafo = nx.DiGraph()
-    coloresPorSensor = ["yellow", "red", "blue"]
-    leyenda_colores = {informacion["nombreSensores"][i]: coloresPorSensor[i] for i in range(len(coloresPorSensor))}
-    leyenda_colores["No sensor"] = "gray"
+    etiquetasSensoresAsignados = {}
+    colores = []
 
-    # Se crean los nodos del grafo dependiendo el color del sensor
+    # Se crean los nodos del grafo y se añaden todos los sensores asignados a cada ubicación
     for ubicacion in M.ubicaciones:
-        tieneSensor = False
+        sensores_en_ubicacion = []
         for sensor in M.sensores:
             if M.asignacion[sensor, ubicacion].value == 1:
-                grafo.add_node(informacion["ubicacionPorId"][ubicacion], color = coloresPorSensor[sensor])
-                tieneSensor = True
-        if not tieneSensor:
-            grafo.add_node(informacion["ubicacionPorId"][ubicacion], color = "gray")
+                sensores_en_ubicacion.append(informacion["nombreSensores"][sensor])
+        sensores_en_ubicacion.sort()
+
+        # Definir las etiquetas y colores de los nodos según si tienen o no sensores asignados
+        if sensores_en_ubicacion:
+            etiquetasSensoresAsignados[informacion["ubicacionPorId"][ubicacion]] = '\n'.join(sensores_en_ubicacion)
+            colores.append('lightgreen')
+        else:
+            etiquetasSensoresAsignados[informacion["ubicacionPorId"][ubicacion]] = "No sensor"
+            colores.append('lightcoral')
+        grafo.add_node(informacion["ubicacionPorId"][ubicacion])
 
     # Se crean las aristas del grafo
     for ubicacionU in range(len(matrizDeAdyacencia)):
         for ubicacionV in range(len(matrizDeAdyacencia[ubicacionU])):
             if ubicacionU != ubicacionV and matrizDeAdyacencia[ubicacionU][ubicacionV] == 1:
                 grafo.add_edge(informacion["ubicacionPorId"][ubicacionU], informacion["ubicacionPorId"][ubicacionV])
+
     pos = nx.spring_layout(grafo)
+    pos_etiquetas = {nodo: (x, y + 0.1) for nodo, (x, y) in pos.items()}
+    plt.figure(figsize=(15, 10))
+    nx.draw(grafo, pos, with_labels=True, node_size=2000, font_size=10, font_weight='bold', arrows=True, node_color=colores)
+    nx.draw_networkx_labels(grafo, pos_etiquetas, labels=etiquetasSensoresAsignados, font_size=10, font_color='black')
 
-    # Dibuja el grafo con los colores de los nodos
-    nx.draw(grafo, pos, with_labels = True,
-            node_color = [grafo.nodes[nodo]["color"] for nodo in grafo.nodes],
-            node_size = 2000, font_size = 10, font_weight = 'bold', arrows = True)
-
-    # Añade las convenciones al gráfico
-    handles = [plt.Line2D([0], [0], marker='o', color = 'w', markerfacecolor = color, markersize = 15, label = label)
-               for label, color in leyenda_colores.items()]
-    plt.legend(handles = handles, loc = "best", title = "Legends")
+    # Añadir convenciones (leyenda)
+    from matplotlib.lines import Line2D
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label='Con sensor', markersize=10, markerfacecolor='lightgreen'),
+                       Line2D([0], [0], marker='o', color='w', label='Sin sensor', markersize=10, markerfacecolor='lightcoral')]
+    plt.legend(handles=legend_elements, loc='best', fontsize=12)
+    plt.title(f"Costo total: {M.objetivo()}", fontsize=14)
     plt.show()
+
+
 
 # Función que obtiene la solución del problema
 def obtenerSolucion(M, matrizDeAdyacencia,informacion):
@@ -96,21 +106,9 @@ def costoInstalacion():
 M.objetivo = Objective(expr = costoEnergia() + costoComunicacion() + costoInstalacion(), sense = minimize)
 
 # Restricciones del modelo
-
-# Solo se puede asignar un tipo de sensor a una ubicación
-M.unicidad = ConstraintList()
-for ubicacion in M.ubicaciones:
-    M.unicidad.add(expr = sum(M.asignacion[sensor, ubicacion] for sensor in M.sensores) <= 1)
-
-# Se deben asignar los sensores en las ubicaciones válidas según el archivo sensor_coverage.csv
-M.ubicacionesValidas = ConstraintList()
-for sensor in M.sensores:
-    for ubicacion in M.ubicaciones:
-        M.ubicacionesValidas.add(expr = M.asignacion[sensor, ubicacion] <= informacion["coberturas"][f"S{sensor+1}"][ubicacion])
-
-# Se deben cubrir todas las ubicaciones
+# Se deben cubrir todas las ubicaciones usando solo sensores validos
 M.cobertura = ConstraintList()
 for ubicacionU in M.ubicaciones:
-    M.cobertura.add(expr = sum(matrizDeAdyacencia[ubicacionU][ubicacionV] * sum(M.asignacion[sensor,ubicacionV] for sensor in M.sensores) for ubicacionV in M.ubicaciones) >= 1)
+    M.cobertura.add(expr = sum(matrizDeAdyacencia[ubicacionU][ubicacionV] * sum(informacion["coberturas"][f"S{sensor+1}"][ubicacionU] * M.asignacion[sensor,ubicacionV] for sensor in M.sensores) for ubicacionV in M.ubicaciones) >= 1)
 
 obtenerSolucion(M, matrizDeAdyacencia, informacion)
