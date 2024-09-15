@@ -45,7 +45,7 @@ M = ConcreteModel()
 
 # Parámetros del modelo
 M.numeroDeNodos = Param(within = PositiveIntegers, default = len(nodos))
-M.equipos = Param(within = PositiveIntegers, default = 2)
+M.equipos = Param(within = PositiveIntegers, default = 3)
 
 # Conjuntos del modelo
 M.nodos = RangeSet(0, M.numeroDeNodos - 1)
@@ -64,11 +64,11 @@ M.autociclo = ConstraintList()
 for i in M.nodos:
     M.autociclo.add(expr = M.asignacion[i, i] == 0)
 
-# Si hay e equipos, entonces deben haber, a lo mucho, e arcos seleccionados que empiecen en el nodo 0
-M.equiposSalientes = Constraint(expr = sum(M.asignacion[0, j] for j in M.nodos) <= M.equipos)
+# Si hay e equipos, entonces deben haber e arcos seleccionados que empiecen en el nodo 0
+M.equiposSalientes = Constraint(expr = sum(M.asignacion[0, j] for j in M.nodos) == M.equipos)
 
 # Si hay e equipos que salen del nodo 0, entonces debe haber e equipos que entran al nodo 0
-M.equiposEntrantes = Constraint(expr = sum(M.asignacion[i, 0] for i in M.nodos) == sum(M.asignacion[0, j] for j in M.nodos))
+M.equiposEntrantes = Constraint(expr = sum(M.asignacion[i, 0] for i in M.nodos) == M.equipos)
 
 # Se debe entrar una vez en cada nodo
 M.unicaEntrada = ConstraintList()
