@@ -61,11 +61,11 @@ M = ConcreteModel()
 # Datos de entrada
 
 # Ciudades origen
-# Bogota
+# Bogotá
 M.ofertaBogota = Param(within = NonNegativeIntegers, default = 550)
 costosTrasporteBogota = [1e8, 2.5, 1.6, 1.4, 0.8, 1.4]
 
-# Medellin
+# Medellín
 M.ofertaMedellin = Param(within = NonNegativeIntegers, default = 700)
 costosTrasporteMedellin = [2.5, 1e8, 2.0, 1.0, 1.0, 0.8]
 
