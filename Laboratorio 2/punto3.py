@@ -74,15 +74,15 @@ M.asignacion = Var(M.sensores, M.ubicaciones, domain = Binary)
 
 # Calcula el costo de energía total al implementar los n sensores de distintos tipos
 def costoEnergia():
-    return sum(informacion["energias"]["EnergyConsumption"][sensor] * sum(M.asignacion[sensor, ubicacion] for ubicacion in M.ubicaciones) for sensor in M.sensores)
+    return sum(sum(informacion["energias"]["EnergyConsumption"][sensor] * M.asignacion[sensor, ubicacion] for sensor in M.sensores) for ubicacion in M.ubicaciones)
 
 # Calcula el costo de comunicación total al implementar los n sensores de distintos tipos
 def costoComunicacion():
-    return sum(informacion["comunicaciones"]["CommunicationCost"][sensor * len(informacion["ubicaciones"]) + ubicacion] * M.asignacion[sensor, ubicacion] for sensor in M.sensores for ubicacion in M.ubicaciones)
+    return sum(sum(informacion["comunicaciones"]["CommunicationCost"][sensor * len(informacion["ubicaciones"]) + ubicacion] * M.asignacion[sensor, ubicacion] for ubicacion in M.ubicaciones) for sensor in M.sensores)
 
 # Calcula el costo de instalación total al implementar los n sensores de distintos tipos
 def costoInstalacion():
-    return sum(informacion["instalaciones"]["InstallationCost"][ubicacion] * sum(M.asignacion[sensor, ubicacion] for sensor in M.sensores) for ubicacion in M.ubicaciones)
+    return sum(sum(informacion["instalaciones"]["InstallationCost"][ubicacion] * M.asignacion[sensor, ubicacion] for ubicacion in M.ubicaciones) for sensor in M.sensores)
 
 # Función objetivo: Minimizar la suma de los costos de energía, comunicación e instalación
 M.objetivo = Objective(expr = costoEnergia() + costoComunicacion() + costoInstalacion(), sense = minimize)
