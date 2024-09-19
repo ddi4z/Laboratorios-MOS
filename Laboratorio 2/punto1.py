@@ -43,31 +43,22 @@ def graficarCostos(G_bogota, G_medellin, G_resumen):
     graficarGrafo(G_bogota, ax[0], "Distribución desde Bogotá", "lightblue")
     graficarGrafo(G_medellin, ax[1], "Distribución desde Medellín", "gold")
     graficarGrafo(G_resumen, ax[2], "Distribución total", "yellow")
-    plt.suptitle("Costo total de transporte: " + str(M.obj()), fontsize = 16)
+    plt.suptitle("Costo total de transporte: " + str(round(M.obj())), fontsize = 16)
     plt.show()
 
 def imprimirSolucionPorConsola():
     print("*****************************************************")
     print("\nSolución")
     totalToneladasDesdeBogota = sum(M.toneladasDesdeBogota[ciudad]() for ciudad in M.ciudades)
-    print(f"Total toneladas calculadas desde Bogotá = {totalToneladasDesdeBogota}")
+    print(f"Total toneladas calculadas desde Bogotá = {round(totalToneladasDesdeBogota)}")
     totalToneladasDesdeMedellin = sum(M.toneladasDesdeMedellin[ciudad]() for ciudad in M.ciudades)
-    print(f"Total toneladas calculadas desde Medellín = {totalToneladasDesdeMedellin}")
+    print(f"Total toneladas calculadas desde Medellín = {round(totalToneladasDesdeMedellin)}")
 
     print("\nAnálisis de sensibilidad")
     print(f"Oferta desde Bogotá = {-M.dual[M.ofertaDesdeBogota]:10.1f}")
     print(f"Oferta desde Medellín = {-M.dual[M.ofertaDesdeMedellin]:10.1f}")
     for indiceCiudad in M.ciudades:
-        print(f"Demanda en {ciudadPorIndice[indiceCiudad]} = {-M.dual[M.demandaPorCiudad[indiceCiudad + 1]]:10.1f}")
-    
-     # TODO: No bota error pero bota ceros 
-    # print(f"Oferta desde Bogotá = {-M.dual.get(M.ofertaDesdeBogota, 0):10.1f}")
-    # print(f"Oferta desde Medellín = {-M.dual.get(M.ofertaDesdeMedellin, 0):10.1f}")
-    
-    # for indiceCiudad in M.ciudades:
-    #     restriccion = M.demandaPorCiudad[indiceCiudad+1]  # Ajustar índice
-    #     print(f"Demanda en {ciudadPorIndice[indiceCiudad]} = {-M.dual.get(restriccion, 0):10.1f}")
-
+        print(f"Demanda en {ciudadPorIndice[indiceCiudad]} = {-M.dual[M.demandaPorCiudad[indiceCiudad+1]]:10.1f}")
     print("*****************************************************")
 
 
@@ -103,8 +94,8 @@ M.cantidadCiudades = Param(within = NonNegativeIntegers, default = len(demandaPo
 M.ciudades = RangeSet(0, M.cantidadCiudades - 1)
 
 # Variables
-M.toneladasDesdeBogota = Var(M.ciudades, domain = NonNegativeIntegers)
-M.toneladasDesdeMedellin = Var(M.ciudades, domain = NonNegativeIntegers)
+M.toneladasDesdeBogota = Var(M.ciudades, domain = NonNegativeReals)
+M.toneladasDesdeMedellin = Var(M.ciudades, domain = NonNegativeReals)
 
 # Función objetivo: Minimizar el costo total de transporte
 M.obj = Objective(expr = sum(M.toneladasDesdeBogota[ciudad] * costosTrasporteBogota[ciudad] for ciudad in M.ciudades) + sum(M.toneladasDesdeMedellin[ciudad] * costosTrasporteMedellin[ciudad] for ciudad in M.ciudades), sense=minimize)
