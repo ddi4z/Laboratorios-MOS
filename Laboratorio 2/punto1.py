@@ -46,17 +46,44 @@ def graficarCostos(G_bogota, G_medellin, G_resumen):
     plt.suptitle("Costo total de transporte: " + str(M.obj()), fontsize = 16)
     plt.show()
 
+def imprimirSolucionPorConsola():
+    print("*****************************************************")
+    print("\nSolución")
+    totalToneladasDesdeBogota = sum(M.toneladasDesdeBogota[ciudad]() for ciudad in M.ciudades)
+    print(f"Total toneladas calculadas desde Bogotá = {totalToneladasDesdeBogota}")
+    totalToneladasDesdeMedellin = sum(M.toneladasDesdeMedellin[ciudad]() for ciudad in M.ciudades)
+    print(f"Total toneladas calculadas desde Medellín = {totalToneladasDesdeMedellin}")
+
+    print("\nAnálisis de sensibilidad")
+    print(f"Oferta desde Bogotá = {-M.dual[M.ofertaDesdeBogota]:10.1f}")
+    print(f"Oferta desde Medellín = {-M.dual[M.ofertaDesdeMedellin]:10.1f}")
+    for indiceCiudad in M.ciudades:
+        print(f"Demanda en {ciudadPorIndice[indiceCiudad]} = {-M.dual[M.demandaPorCiudad[indiceCiudad + 1]]:10.1f}")
+    
+     # TODO: No bota error pero bota ceros 
+    # print(f"Oferta desde Bogotá = {-M.dual.get(M.ofertaDesdeBogota, 0):10.1f}")
+    # print(f"Oferta desde Medellín = {-M.dual.get(M.ofertaDesdeMedellin, 0):10.1f}")
+    
+    # for indiceCiudad in M.ciudades:
+    #     restriccion = M.demandaPorCiudad[indiceCiudad+1]  # Ajustar índice
+    #     print(f"Demanda en {ciudadPorIndice[indiceCiudad]} = {-M.dual.get(restriccion, 0):10.1f}")
+
+    print("*****************************************************")
+
 
 # Muestra la solución del modelo
 def obtenerSolucion(M):
     SolverFactory('glpk').solve(M)
     M.display()
+    imprimirSolucionPorConsola()
     G_bogota, G_medellin, G_resumen = crearGrafos(M)
     graficarCostos(G_bogota, G_medellin, G_resumen)
 
 # Creación del modelo
 M = ConcreteModel()
 
+# Acceso a la solución dual para las restricciones
+M.dual = Suffix(direction=Suffix.IMPORT)
 
 # Datos de entrada
 
