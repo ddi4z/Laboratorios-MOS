@@ -59,7 +59,7 @@ M.objetivo = Objective(expr = sum(M.asignacion[i, j] * matrizDeAdyacencia[i, j] 
 
 # Restricciones del modelo
 
-# No se puede ir de un nodo a sí mismo
+# No se puede ir de un nodo a sí mismo (autociclos)
 M.autociclo = ConstraintList()
 for i in M.nodos:
     M.autociclo.add(expr = M.asignacion[i, i] == 0)
