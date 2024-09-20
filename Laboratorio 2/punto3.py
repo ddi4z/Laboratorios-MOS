@@ -86,6 +86,8 @@ def costoInstalacion():
 
 # Función objetivo: Minimizar la suma de los costos de energía, comunicación e instalación
 M.objetivo = Objective(expr = costoEnergia() + costoComunicacion() + costoInstalacion(), sense = minimize)
+# Función objetivo alterada: Solo costo de instalación
+# M.objetivo = Objective(expr = costoInstalacion(), sense = minimize)
 
 # Restricciones del modelo
 # Se deben cubrir todas las ubicaciones garantizando que se cuente con todos los sensores necesarios por ubicación
