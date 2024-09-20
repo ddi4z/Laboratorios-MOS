@@ -48,7 +48,7 @@ def graficarCostos(G_bogota, G_medellin, G_resumen):
 
 def imprimirSolucionPorConsola():
     print("*****************************************************")
-    print("\nSolución")
+    print("Solución")
     totalToneladasDesdeBogota = sum(M.toneladasDesdeBogota[ciudad]() for ciudad in M.ciudades)
     print(f"Total toneladas calculadas desde Bogotá = {round(totalToneladasDesdeBogota)}")
     totalToneladasDesdeMedellin = sum(M.toneladasDesdeMedellin[ciudad]() for ciudad in M.ciudades)
@@ -81,10 +81,20 @@ M.dual = Suffix(direction=Suffix.IMPORT)
 # Ciudades origen
 # Bogotá
 M.ofertaBogota = Param(within = NonNegativeIntegers, default = 550)
+# Cambio para análisis de sensibilidad (+ 50 toneladas)
+# M.ofertaBogota = Param(within = NonNegativeIntegers, default = 600)
+# Solución óptima: Cambio adicional análisis de sensibilidad (+ 50 toneladas)
+# M.ofertaBogota = Param(within = NonNegativeIntegers, default = 650)
+
 costosTrasporteBogota = [1e8, 2.5, 1.6, 1.4, 0.8, 1.4]
 
 # Medellín
 M.ofertaMedellin = Param(within = NonNegativeIntegers, default = 700)
+# Cambio para análisis de sensibilidad (- 50 toneladas)
+# M.ofertaMedellin = Param(within = NonNegativeIntegers, default = 650)
+# Solución óptima: Cambio adicional para análisis de sensibilidad (- 50 toneladas)
+# M.ofertaMedellin = Param(within = NonNegativeIntegers, default = 600)
+
 costosTrasporteMedellin = [2.5, 1e8, 2.0, 1.0, 1.0, 0.8]
 
 # Ciudades destino
