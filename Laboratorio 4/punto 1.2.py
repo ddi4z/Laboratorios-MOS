@@ -1,4 +1,11 @@
+"""
+Script que implementa el método Simplex de forma tabulada para resolver el 
+problema de Woodcarving
+
+"""
+
 class Simplex:
+
     def __init__(self, coeficientes, restricciones, soluciones):
         self.coeficientes = coeficientes
         self.restricciones = restricciones
@@ -54,6 +61,7 @@ class Simplex:
 
 
 def main():
+    # Información del problema
     coeficientes = [-3, -2]
     restricciones = [
         [2, 1],
@@ -62,7 +70,7 @@ def main():
     ]
     soluciones = [100, 80, 40]
 
-
+    # Resolución del problema
     simplex = Simplex(coeficientes, restricciones, soluciones)
     solucionOptima, valorMaximo = simplex.resolver()
 
