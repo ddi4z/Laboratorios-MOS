@@ -1,4 +1,8 @@
 """
+** Integrantes - Grupo 15 **
+
+Daniel Felipe Diaz Moreno y Sara Sofía Cárdenas Rodríguez
+
 Script que calcula el Frente de Pareto (metodo de e-constraint) de dos funciones 
 objetivo del modelo matematico.
 
